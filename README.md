@@ -55,6 +55,13 @@ echo 'alias ytmp3="$HOME/path/to/youtube-mp3-bot/bot.sh"' >> ~/.zshrc
 - YouTube serves audio as Opus at ~160 kbps at most; the bot grabs that best-quality track and converts it with LAME's highest-quality setting (`-q 0`, VBR ~245 kbps) so nothing is lost in conversion.
 - If downloads stop working someday, update yt-dlp: `./.venv/bin/pip install -U yt-dlp` (YouTube changes often and yt-dlp updates to keep up).
 
+## ☕ Support
+
+If this bot is useful to you and you'd like to support its development:
+
+- [GitHub Sponsors](https://github.com/sponsors/BaltaJmn)
+- [Buy Me a Coffee](https://buymeacoffee.com/baltajmn)
+
 ## Disclaimer
 
 This tool is provided for personal and educational use. Downloading content from YouTube may violate [YouTube's Terms of Service](https://www.youtube.com/t/terms). Only download content you have the right to download (your own videos, Creative Commons licensed content, or content whose owner has given you permission). The authors take no responsibility for misuse.
