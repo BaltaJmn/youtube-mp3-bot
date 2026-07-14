@@ -59,8 +59,7 @@ echo 'alias ytmp3="$HOME/path/to/youtube-mp3-bot/bot.sh"' >> ~/.zshrc
 
 If this bot is useful to you and you'd like to support its development:
 
-- [GitHub Sponsors](https://github.com/sponsors/BaltaJmn)
-- [Buy Me a Coffee](https://buymeacoffee.com/baltajmn)
+- [Ko-fi](https://ko-fi.com/baltajmn)
 
 ## Disclaimer
 
