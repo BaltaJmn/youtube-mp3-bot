@@ -7,4 +7,9 @@ if [ ! -d ".venv" ]; then
     exit 1
 fi
 
+./.venv/bin/python bot.py "$@" && exit 0
+
+# YouTube breaks old yt-dlp versions (HTTP 403). Update once and retry.
+echo "==> Updating yt-dlp and retrying..."
+./.venv/bin/pip install --upgrade yt-dlp --quiet
 exec ./.venv/bin/python bot.py "$@"
