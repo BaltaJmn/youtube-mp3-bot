@@ -4,6 +4,7 @@
 Usage:
     python3 bot.py                  # interactive mode: paste links one by one
     python3 bot.py <link> [<link>]  # direct download of one or more links
+    python3 bot.py --m4a ...        # fast mode: YouTube's own AAC audio, no conversion
 """
 
 import os
@@ -23,21 +24,29 @@ DOWNLOADS_DIR = Path(
 )
 
 
-def download_options() -> dict:
-    return {
+def download_options(m4a: bool = False) -> dict:
+    if m4a:
+        # YouTube already serves AAC (~130 kbps) in .m4a: it is copied as is,
+        # so a 2-hour set takes seconds instead of minutes. Plays on any phone.
+        fmt = "bestaudio[ext=m4a]/bestaudio/best"
+        audio = {"key": "FFmpegExtractAudio", "preferredcodec": "m4a"}
+    else:
         # Best audio track available (usually Opus ~160 kbps on YouTube)
-        "format": "bestaudio/best",
+        fmt = "bestaudio/best"
+        audio = {
+            "key": "FFmpegExtractAudio",
+            "preferredcodec": "mp3",
+            # "0" = best VBR quality the LAME encoder offers (~245 kbps)
+            "preferredquality": "0",
+        }
+    return {
+        "format": fmt,
         "outtmpl": str(DOWNLOADS_DIR / "%(title)s.%(ext)s"),
         "postprocessors": [
-            {
-                "key": "FFmpegExtractAudio",
-                "preferredcodec": "mp3",
-                # "0" = best VBR quality the LAME encoder offers (~245 kbps)
-                "preferredquality": "0",
-            },
-            # Adds title, artist, etc. as ID3 tags
+            audio,
+            # Adds title, artist, etc. as tags
             {"key": "FFmpegMetadata"},
-            # Embeds the video thumbnail as MP3 cover art
+            # Embeds the video thumbnail as cover art
             {"key": "EmbedThumbnail"},
         ],
         "writethumbnail": True,
@@ -47,10 +56,10 @@ def download_options() -> dict:
     }
 
 
-def download(link: str) -> bool:
+def download(link: str, m4a: bool = False) -> bool:
     DOWNLOADS_DIR.mkdir(exist_ok=True)
     try:
-        with yt_dlp.YoutubeDL(download_options()) as ydl:
+        with yt_dlp.YoutubeDL(download_options(m4a)) as ydl:
             info = ydl.extract_info(link, download=True)
         title = info.get("title", "unknown")
         print(f"\n✅ Downloaded: {title}")
@@ -61,9 +70,9 @@ def download(link: str) -> bool:
         return False
 
 
-def interactive_mode() -> None:
-    print("🎵 YouTube → MP3 download bot")
-    print(f"   MP3 files are saved to: {DOWNLOADS_DIR}")
+def interactive_mode(m4a: bool) -> None:
+    print("🎵 YouTube → MP3 download bot" + (" (fast mode: m4a)" if m4a else ""))
+    print(f"   Files are saved to: {DOWNLOADS_DIR}")
     print("   Paste a YouTube link and press Enter ('quit' to exit).\n")
     while True:
         try:
@@ -76,15 +85,16 @@ def interactive_mode() -> None:
         if link.lower() in {"quit", "exit", "q"}:
             print("Bye!")
             break
-        download(link)
+        download(link, m4a)
 
 
 def main() -> None:
-    links = sys.argv[1:]
+    m4a = "--m4a" in sys.argv[1:]
+    links = [arg for arg in sys.argv[1:] if arg != "--m4a"]
     if links:
-        failures = sum(not download(link) for link in links)
+        failures = sum(not download(link, m4a) for link in links)
         sys.exit(1 if failures else 0)
-    interactive_mode()
+    interactive_mode(m4a)
 
 
 if __name__ == "__main__":

@@ -42,6 +42,12 @@ bot.bat "https://www.youtube.com/watch?v=XXXXXXXX"      # Windows
 
 MP3 files are saved to the `downloads/` folder.
 
+**Fast mode**: add `--m4a` to skip the MP3 conversion and keep YouTube's own AAC audio (~130 kbps) in an `.m4a` file. It plays on any phone, and a 2-hour set is ready in seconds instead of minutes:
+
+```bash
+./bot.sh --m4a 'https://www.youtube.com/watch?v=XXXXXXXX'
+```
+
 ### Optional: `ytmp3` shortcut (macOS)
 
 Add an alias to your `~/.zshrc` so you can run the bot from anywhere:
@@ -52,7 +58,7 @@ echo 'alias ytmp3="$HOME/path/to/youtube-mp3-bot/bot.sh"' >> ~/.zshrc
 
 ### Optional: from your phone, anywhere (Raspberry Pi)
 
-`web.py` is a one-page front-end: paste a link on your phone, the server downloads and converts it, and a link to the MP3 shows up when it is ready. The server is only a relay: each MP3 is deleted an hour after it has been downloaded (time to retry a download cut short), or after 24 h if nobody picks it up. Only links to a single video are accepted, never playlists or channels.
+`web.py` is a one-page front-end: paste a link on your phone, the server downloads it in fast mode (`.m4a`, no conversion) and a link to the file shows up when it is ready. The server is only a relay: each file is deleted an hour after it has been downloaded (time to retry a download cut short), or after 24 h if nobody picks it up. Only links to a single video are accepted, never playlists or channels.
 
 On a Raspberry Pi with a 64-bit OS (Deno has no 32-bit ARM build):
 
@@ -62,7 +68,7 @@ sudo cp mp3-web.service /etc/systemd/system/ # assumes the repo is in /home/pi/y
 sudo systemctl enable --now mp3-web          # listens on 127.0.0.1:8765 only
 ```
 
-`web.py` has no login of its own, so never publish the port directly. To reach it from outside home, put a [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/) in front of `http://127.0.0.1:8765` and a [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/applications/) application on the same hostname, allowing only your email. A Raspberry Pi 3 converts at about 6x real time, so a 2-hour set takes around 20 minutes.
+`web.py` has no login of its own, so never publish the port directly. To reach it from outside home, put a [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/) in front of `http://127.0.0.1:8765` and a [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/applications/) application on the same hostname, allowing only your email.
 
 ## Notes
 
