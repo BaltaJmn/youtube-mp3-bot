@@ -2,13 +2,13 @@
 
 Small command-line bot that downloads the audio track of YouTube videos and converts it to MP3 at the best possible quality (LAME VBR ~245 kbps), with the video thumbnail embedded as cover art and ID3 metadata (title, artist) filled in.
 
-Works on **macOS** and **Windows**. Built on [yt-dlp](https://github.com/yt-dlp/yt-dlp) and [ffmpeg](https://ffmpeg.org).
+Works on **macOS**, **Windows** and **Linux** (Debian, Raspberry Pi OS), and can run on a Raspberry Pi as a small web page for your phone. Built on [yt-dlp](https://github.com/yt-dlp/yt-dlp) and [ffmpeg](https://ffmpeg.org).
 
 ## Setup (first time only)
 
-### macOS
+### macOS and Linux
 
-Requires [Homebrew](https://brew.sh).
+On macOS it requires [Homebrew](https://brew.sh); on Linux it uses `apt`.
 
 ```bash
 ./setup.sh
@@ -49,6 +49,20 @@ Add an alias to your `~/.zshrc` so you can run the bot from anywhere:
 ```bash
 echo 'alias ytmp3="$HOME/path/to/youtube-mp3-bot/bot.sh"' >> ~/.zshrc
 ```
+
+### Optional: from your phone, anywhere (Raspberry Pi)
+
+`web.py` is a one-page front-end: paste a link on your phone, the server downloads and converts it, and a link to the MP3 shows up when it is ready. The server is only a relay: each MP3 is deleted an hour after it has been downloaded (time to retry a download cut short), or after 24 h if nobody picks it up. Only links to a single video are accepted, never playlists or channels.
+
+On a Raspberry Pi with a 64-bit OS (Deno has no 32-bit ARM build):
+
+```bash
+./setup.sh                                   # apt installs ffmpeg, Deno goes to /usr/local
+sudo cp mp3-web.service /etc/systemd/system/ # assumes the repo is in /home/pi/youtube-mp3-bot
+sudo systemctl enable --now mp3-web          # listens on 127.0.0.1:8765 only
+```
+
+`web.py` has no login of its own, so never publish the port directly. To reach it from outside home, put a [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/) in front of `http://127.0.0.1:8765` and a [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/applications/) application on the same hostname, allowing only your email. A Raspberry Pi 3 converts at about 6x real time, so a 2-hour set takes around 20 minutes.
 
 ## Notes
 

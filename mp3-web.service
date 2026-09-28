@@ -1,0 +1,20 @@
+# systemd unit for web.py on the Raspberry Pi. Paths assume the repo lives in
+# /home/pi/youtube-mp3-bot; edit them if it does not.
+#
+#   sudo cp mp3-web.service /etc/systemd/system/
+#   sudo systemctl enable --now mp3-web
+[Unit]
+Description=YouTube MP3 web front-end
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=pi
+WorkingDirectory=/home/pi/youtube-mp3-bot
+ExecStart=/home/pi/youtube-mp3-bot/.venv/bin/python web.py
+# Download progress goes straight to journalctl -u mp3-web
+Environment=PYTHONUNBUFFERED=1
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

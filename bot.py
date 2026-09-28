@@ -6,6 +6,7 @@ Usage:
     python3 bot.py <link> [<link>]  # direct download of one or more links
 """
 
+import os
 import sys
 from pathlib import Path
 
@@ -16,7 +17,10 @@ except ImportError:
         "yt-dlp is missing. Run the setup script first, or install it with: pip3 install yt-dlp"
     )
 
-DOWNLOADS_DIR = Path(__file__).resolve().parent / "downloads"
+# web.py points this at a private folder per job, so half-converted files never show up
+DOWNLOADS_DIR = Path(
+    os.environ.get("MP3_DOWNLOADS_DIR") or Path(__file__).resolve().parent / "downloads"
+)
 
 
 def download_options() -> dict:
