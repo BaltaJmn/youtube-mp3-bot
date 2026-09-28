@@ -34,7 +34,9 @@ if not exist .venv (
 )
 
 echo ==^> Installing yt-dlp...
-.venv\Scripts\pip install --upgrade pip yt-dlp --quiet
+REM [default] adds yt-dlp-ejs (the scripts Deno runs for YouTube's challenges) and
+REM mutagen (cover art in .m4a files; the ffmpeg fallback fails on videos with chapters)
+.venv\Scripts\pip install --upgrade pip "yt-dlp[default]" --quiet
 
 echo.
 echo Done. If ffmpeg or Deno were just installed, CLOSE this window and open a new one so PATH updates.

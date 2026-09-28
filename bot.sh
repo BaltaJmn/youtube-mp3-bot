@@ -11,5 +11,5 @@ fi
 
 # YouTube breaks old yt-dlp versions (HTTP 403). Update once and retry.
 echo "==> Updating yt-dlp and retrying..."
-./.venv/bin/pip install --upgrade yt-dlp --quiet
+./.venv/bin/pip install --upgrade "yt-dlp[default]" --quiet
 exec ./.venv/bin/python bot.py "$@"

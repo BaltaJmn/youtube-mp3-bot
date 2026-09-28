@@ -44,7 +44,9 @@ if [ ! -d ".venv" ]; then
 fi
 
 echo "==> Installing yt-dlp..."
-./.venv/bin/pip install --upgrade pip yt-dlp --quiet
+# [default] adds yt-dlp-ejs (the scripts Deno runs for YouTube's challenges) and
+# mutagen (cover art in .m4a files; the ffmpeg fallback fails on videos with chapters)
+./.venv/bin/pip install --upgrade pip "yt-dlp[default]" --quiet
 
 echo ""
 echo "✅ Done. To use the bot:"
