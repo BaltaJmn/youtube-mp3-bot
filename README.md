@@ -58,7 +58,7 @@ echo 'alias ytmp3="$HOME/path/to/youtube-mp3-bot/bot.sh"' >> ~/.zshrc
 
 ### Optional: from your phone, anywhere (Raspberry Pi)
 
-`web.py` is a one-page front-end: paste a link on your phone, the server downloads it in fast mode (`.m4a`, no conversion) and a link to the file shows up when it is ready. The server is only a relay: each file is deleted an hour after it has been downloaded (time to retry a download cut short), or after 24 h if nobody picks it up. Only links to a single video are accepted, never playlists or channels.
+`web.py` is a one-page front-end: paste a link on your phone, the server downloads it in fast mode (`.m4a`, no conversion) and a link to the file shows up when it is ready. Files stay on the server as a library, to download again from any device, until you delete them from the page. Only links to a single video are accepted, never playlists or channels.
 
 On a Raspberry Pi with a 64-bit OS (Deno has no 32-bit ARM build):
 
@@ -68,12 +68,20 @@ sudo cp mp3-web.service /etc/systemd/system/ # assumes the repo is in /home/pi/y
 sudo systemctl enable --now mp3-web          # listens on 127.0.0.1:8765 only
 ```
 
+To keep yt-dlp current without waiting for a download to fail, update it every night (`crontab -e`):
+
+```
+17 5 * * * $HOME/youtube-mp3-bot/.venv/bin/pip install --upgrade --quiet "yt-dlp[default]" 2>&1 | logger -t yt-dlp-update
+```
+
+Each download runs in its own process, so the new version is picked up without restarting `mp3-web`.
+
 `web.py` has no login of its own, so never publish the port directly. To reach it from outside home, put a [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/) in front of `http://127.0.0.1:8765` and a [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/applications/) application on the same hostname, allowing only your email.
 
 ## Notes
 
 - YouTube serves audio as Opus at ~160 kbps at most; the bot grabs that best-quality track and converts it with LAME's highest-quality setting (`-q 0`, VBR ~245 kbps) so nothing is lost in conversion.
-- If downloads stop working someday, update yt-dlp: `./.venv/bin/pip install -U yt-dlp` (YouTube changes often and yt-dlp updates to keep up).
+- YouTube changes often and breaks old yt-dlp versions. When a download fails, `bot.sh` and `bot.bat` update yt-dlp and retry on their own; to update by hand: `./.venv/bin/pip install -U "yt-dlp[default]"`.
 
 ## ☕ Support
 
